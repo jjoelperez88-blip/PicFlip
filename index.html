@@ -1,0 +1,1064 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Picflip — Should I Buy It?</title>
+<style>
+:root{
+  --bg:#f5f7fb; --surface:#ffffff; --surface2:#eef2f8; --text:#0f1b2d; --muted:#64748b;
+  --border:#e3e9f2; --primary:#2456d8; --primary2:#3b82f6; --accent:#f59e0b;
+  --buy:#059669; --maybe:#d97706; --skip:#dc2626;
+  --shadow:0 1px 2px rgba(15,23,42,.05), 0 10px 28px rgba(15,23,42,.07); --radius:14px;
+  --grad:linear-gradient(135deg,#2456d8,#3b82f6);
+}
+[data-theme="dark"]{
+  --bg:#0b1220; --surface:#111a2e; --surface2:#1a2440; --text:#e6edf7; --muted:#8ea0bd;
+  --border:#223049; --primary:#3b82f6; --primary2:#60a5fa; --accent:#fbbf24;
+  --shadow:0 8px 26px rgba(0,0,0,.38);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;transition:background .3s,color .3s;-webkit-font-smoothing:antialiased}
+#phone{max-width:430px;margin:0 auto;min-height:100vh;position:relative;display:flex;flex-direction:column}
+/* ===== Top bar ===== */
+.topbar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(16px);padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.logo{font-weight:700;font-size:18px;display:flex;align-items:center;gap:10px;letter-spacing:-.02em;cursor:default}
+.logo .dot{width:34px;height:34px;border-radius:10px;background:var(--grad);display:grid;place-items:center;color:#fff;box-shadow:0 4px 12px rgba(36,86,216,.35)}
+.logo .word{font-size:18px;line-height:1;letter-spacing:-.01em}
+.logo .word b{color:var(--text)}
+.topbar .spacer{flex:1}
+.scan-pill{background:var(--surface2);border:1px solid var(--border);padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:6px}
+.scan-pill i{font-style:normal}
+.scan-pill .dot-b{width:7px;height:7px;border-radius:50%;background:var(--primary)}
+/* ===== Splash / loading screen ===== */
+#splash{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .45s ease;}
+#splash.hide{opacity:0;pointer-events:none}
+#splash .s-logo{width:72px;height:72px;border-radius:20px;background:var(--grad);display:grid;place-items:center;color:#fff;box-shadow:0 14px 34px rgba(36,86,216,.35)}
+#splash .s-logo svg{width:38px;height:38px}
+#splash .s-word{font-size:26px;font-weight:800;letter-spacing:-.02em;color:var(--text)}
+#splash .s-tag{font-size:13px;color:var(--muted);font-weight:500;margin-top:-6px}
+#splash .s-bar{width:180px;height:4px;border-radius:4px;background:var(--surface2);overflow:hidden}
+#splash .s-bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:4px;transition:width .35s ease}
+#splash .s-prog{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.05em}
+/* ===== Welcome hero ===== */
+.hero{margin-top:16px;background:var(--grad);border-radius:16px;padding:22px 20px;color:#fff;position:relative;overflow:hidden;box-shadow:0 12px 30px rgba(36,86,216,.28)}
+.hero .greet{font-size:13px;font-weight:600;opacity:.92}
+.hero h1{font-size:24px;font-weight:700;margin-top:4px;letter-spacing:-.02em;line-height:1.2}
+.hero p{font-size:13.5px;opacity:.95;margin-top:6px;max-width:92%}
+/* ===== Bottom nav ===== */
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+.nav button{flex:1;background:none;border:none;color:var(--muted);font-size:10px;font-weight:600;padding:9px 4px 11px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:.2s}
+.nav button .ic{width:22px;height:22px;transition:.2s}
+.nav button.active{color:var(--primary)}
+.nav button svg{display:block;width:22px;height:22px;stroke-width:1.8}
+/* ===== Pages ===== */
+.page{display:none;padding:0 18px 112px;animation:fade .4s ease}
+.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pagetitle{font-size:22px;font-weight:700;letter-spacing:-.02em;margin-top:20px}
+.pagesub{color:var(--muted);font-size:13.5px;margin-top:3px}
+h2{font-size:16px;font-weight:650}
+.sub{color:var(--muted);font-size:13.5px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-top:14px}
+/* ===== Scan buttons ===== */
+.bigscan{background:var(--grad);border:none;border-radius:16px;color:#fff;padding:24px;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:12px;font-weight:650;font-size:17px;cursor:pointer;box-shadow:0 12px 30px rgba(36,86,216,.3);transition:transform .15s}
+.bigscan:hover{transform:translateY(-1px)}
+.bigscan svg{width:26px;height:26px}
+.bigscan .hint{font-size:12px;font-weight:500;opacity:.85;margin-left:2px}
+.smallbtn{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:11px 13px;font-weight:600;font-size:13px;cursor:pointer;transition:.15s}
+.smallbtn:hover{border-color:var(--primary);color:var(--primary)}
+.btn{background:var(--grad);border:none;color:#fff;border-radius:10px;padding:13px 16px;font-weight:650;font-size:14px;cursor:pointer;box-shadow:0 5px 14px rgba(36,86,216,.28);transition:transform .12s}
+.btn:hover{transform:translateY(-1px)}
+.btn.block{width:100%}
+.btn.ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border);box-shadow:none}
+.row{display:flex;gap:10px;align-items:center}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:1fr 1fr}
+/* ===== Metrics ===== */
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+.metric .lab{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.metric .val{font-size:22px;font-weight:750;margin-top:4px;letter-spacing:-.01em}
+.metric .val.green{color:var(--buy)}.metric .val.red{color:var(--skip)}.metric .val.amber{color:var(--maybe)}.metric .val.purple{color:var(--primary)}
+/* ===== Recommendation ===== */
+.rec{border-radius:14px;padding:16px 20px;text-align:left;color:#fff;font-weight:700;font-size:18px;box-shadow:var(--shadow);margin-top:16px;display:flex;align-items:center;gap:14px}
+.rec .rec-badge{display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;padding:4px 12px;border-radius:8px;background:rgba(255,255,255,.22);letter-spacing:.04em;text-transform:uppercase}
+.rec .small{display:block;font-size:12px;font-weight:500;opacity:.92;margin-top:3px}
+.rec.buy{background:linear-gradient(135deg,#047857,#059669)}
+.rec.maybe{background:linear-gradient(135deg,#b45309,#d97706)}
+.rec.skip{background:linear-gradient(135deg,#b91c1c,#dc2626)}
+.reason{background:var(--surface2);border-radius:12px;padding:13px 15px;font-size:13.5px;color:var(--text);margin-top:12px;border-left:3px solid var(--primary)}
+/* ===== Inputs ===== */
+label{font-size:11px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+input,select{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px 14px;font-size:15px;font-weight:500;outline:none;transition:border-color .2s}
+input:focus,select:focus{border-color:var(--primary)}
+.inputgroup{margin-top:12px}
+.currency{position:relative}
+.currency input{padding-left:34px}
+.currency .cur{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-weight:800;color:var(--muted)}
+/* ===== Chips ===== */
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:999px;padding:5px 11px;font-size:12px;font-weight:600}
+.tag{display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:3px 9px;font-size:10.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.badge-est{background:rgba(245,158,11,.12);color:var(--maybe);border:1px solid rgba(245,158,11,.3)}
+.badge-info{background:rgba(36,86,216,.08);color:var(--primary);border:1px solid rgba(36,86,216,.25)}
+/* ===== Lists ===== */
+.list-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-top:10px;box-shadow:var(--shadow);display:flex;gap:12px;align-items:center;cursor:pointer;transition:transform .12s}
+.list-item:hover{transform:translateX(2px)}
+.thumb{width:50px;height:50px;border-radius:10px;background:var(--surface2);display:grid;place-items:center;font-size:22px;flex-shrink:0;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.li-body{flex:1;min-width:0}
+.li-title{font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.li-pro{font-size:15px;font-weight:800;margin-top:4px}
+.tiny{font-size:11px;color:var(--muted)}
+.hidden{display:none!important}
+.iconbtn{background:var(--surface2);border:1px solid var(--border);border-radius:12px;width:36px;height:36px;display:grid;place-items:center;cursor:pointer;font-size:16px}
+.setting{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 0;border-bottom:1px solid var(--border)}
+.setting:last-child{border-bottom:none}
+.setting .st-l{font-weight:700;font-size:14px}
+.setting .st-s{font-size:12px;color:var(--muted)}
+/* ===== Toggle ===== */
+.switch{width:48px;height:27px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);position:relative;cursor:pointer;transition:.25s;flex-shrink:0}
+.switch.on{background:var(--grad);border-color:transparent}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.switch.on::after{left:23px}
+/* ===== Pro banner ===== */
+.pro-banner{background:var(--grad);color:#fff;border-radius:var(--radius);padding:20px;margin-top:14px;position:relative;overflow:hidden}
+.pro-banner h2{color:#fff}
+.pro-banner .price{font-size:30px;font-weight:750}
+.pro-banner .price span{font-size:14px;font-weight:500;opacity:.9}
+.pro-banner ul{list-style:none;margin-top:10px}
+.pro-banner li{font-size:13px;padding:4px 0;display:flex;gap:8px;align-items:center}
+.pro-banner li::before{content:"✓";color:#d3f5e0;font-weight:700}
+.scan-progress{position:relative;height:8px;background:var(--surface2);border-radius:6px;overflow:hidden;margin-top:16px}
+.scan-progress .fill{height:100%;background:var(--grad);border-radius:6px;transition:width 1.1s ease}
+.empty{text-align:center;color:var(--muted);padding:30px 10px;font-size:13.5px}
+.two-col{display:flex;gap:10px;margin-top:12px}
+.section-label{font-size:12px;font-weight:800;margin-top:20px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+/* scan preview */
+.scanbox{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-top:16px}
+.scanframe{height:230px;background:var(--surface2);display:grid;place-items:center;position:relative;border-bottom:1px solid var(--border)}
+.scanframe .crosshair{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at center,transparent 42%,rgba(36,86,216,.05) 43%);}
+.scanframe .crosshair::before,.scanframe .crosshair::after{content:"";position:absolute;background:rgba(36,86,216,.28)}
+.scanframe .crosshair::before{left:20%;right:20%;top:50%;height:1px}
+.scanframe .crosshair::after{top:20%;bottom:20%;left:50%;width:1px}
+.scanframe .cam-icon{text-align:center;color:var(--muted)}
+.scanframe .cam-icon svg{width:44px;height:44px;display:block;margin:0 auto 8px;stroke:var(--primary)}
+.scanframe img{width:100%;height:100%;object-fit:cover}
+.scan-actions{padding:16px;display:flex;flex-direction:column;gap:10px}
+/* trend bar */
+.trendbar{display:flex;align-items:flex-end;gap:5px;height:56px;margin-top:10px}
+.trendbar .tb{flex:1;border-radius:3px 3px 0 0;background:var(--surface2);transition:.3s}
+.trendbar .tb.live{background:var(--grad)}
+</style>
+</head>
+<body>
+<div id="splash">
+  <div class="s-logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7.5 6H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2.5z"/><circle cx="12" cy="13" r="3.5"/></svg></div>
+  <div class="s-word">Picflip</div>
+  <div class="s-tag">Should I buy it?</div>
+  <div class="s-bar"><i id="splashFill"></i></div>
+  <div class="s-prog" id="splashProg">0%</div>
+</div>
+<div id="phone">
+  <div class="topbar">
+    <div class="logo"><span class="dot"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7.5 6H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2.5z"/><circle cx="12" cy="13" r="3.5"/></svg></span><span class="word"><b>Picflip</b></span></div>
+    <div class="spacer"></div>
+    <span class="scan-pill" id="scanPill"><span class="dot-b"></span><span id="scanPillTxt">10 left today</span></span>
+  </div>
+
+  <!-- ============ HOME ============ -->
+  <div class="page active" id="page-home">
+    <div class="hero">
+      <div class="greet" id="greet">Welcome back</div>
+      <h1>Should I buy it?</h1>
+      <p>Scan any item to see its resale potential, where to sell it, and how much you could make.</p>
+    </div>
+
+    <button class="bigscan" onclick="go('scanner')"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7.5 6H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2.5z"/><circle cx="12" cy="13" r="3.5"/></svg> Scan Item <span class="hint">photo or upload</span></button>
+
+    <div class="metrics" style="grid-template-columns:1fr 1fr 1fr;margin-top:16px">
+      <div class="metric"><div class="lab">Scans</div><div class="val" id="homeScans">0</div></div>
+      <div class="metric"><div class="lab">Saved</div><div class="val" id="homeSavedC">0</div></div>
+      <div class="metric"><div class="lab">Profit</div><div class="val" id="homeProfit" style="font-size:17px">$0</div></div>
+    </div>
+
+    <div class="card" id="emailBox" style="margin-top:16px">
+      <div style="font-weight:700;font-size:14px">Get resale tips</div>
+      <p class="sub" style="font-size:12.5px;margin:4px 0 10px">Join the list for flipping strategies and price trends.</p>
+      <div class="row">
+        <input id="emailInput" type="email" placeholder="you@email.com" style="flex:1">
+        <button class="btn" onclick="saveEmail()">Join</button>
+      </div>
+    </div>
+
+    <div class="section-label">Recent Scans</div>
+    <div id="homeRecent"></div>
+  </div>
+
+  <!-- ============ SCANNER ============ -->
+  <div class="page" id="page-scanner">
+    <div class="pagetitle">Scan an item</div>
+    <p class="pagesub">Take a photo or upload one to analyze its resale potential.</p>
+
+    <div class="scanbox" id="scanCard">
+      <div class="scanframe" id="scanPreview">
+        <div class="crosshair" id="crossHairEl"></div>
+        <video id="cameraFeed" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:none"></video>
+        <canvas id="snapCanvas" style="display:none"></canvas>
+        <div class="cam-icon" id="camIcon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7.5 6H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2.5z"/><circle cx="12" cy="13" r="3.5"/></svg><div style="font-size:13px;font-weight:600">Point at the item</div><div style="font-size:11.5px">Fill the frame for best results</div></div>
+        <div id="photoPreview" style="position:absolute;inset:0;display:none"><img id="photoImg" style="width:100%;height:100%;object-fit:cover"></div>
+      </div>
+      <div class="scan-actions">
+        <div class="row" id="camButtons">
+          <button class="btn" style="flex:1.3" onclick="scanNow()" id="camBtn">Open Camera</button>
+          <label style="margin:0;flex:1" for="fileInput">
+            <span class="btn ghost block" style="display:block;text-align:center">Upload</span>
+          </label>
+          <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleUpload(event)">
+        </div>
+        <div style="font-size:11.5px;color:var(--muted);text-align:center">or try a sample item</div>
+        <div class="grid g2" id="samples"></div>
+        <button class="btn ghost block" onclick="toggleBundle()" id="bundleBtn">Scan multiple items (bundle)</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="bundleBox">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h2>Bundle total</h2>
+        <button class="smallbtn" onclick="clearBundle()">Clear</button>
+      </div>
+      <div id="bundleList" style="margin-top:8px"></div>
+      <div style="display:flex;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+        <b>Estimated value</b><b id="bundleTotal" style="font-size:18px;color:var(--buy)">$0</b>
+      </div>
+    </div>
+
+    <div class="card hidden" id="scanningBox">
+      <h2>Analyzing item…</h2>
+      <p class="sub" id="scanStatus" style="margin-top:6px">Identifying object</p>
+      <div class="scan-progress"><div class="fill" id="scanFill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- ============ RESULT ============ -->
+  <div class="page" id="page-result">
+    <div id="resultTop"></div>
+    <div id="resultBody"></div>
+  </div>
+
+  <!-- ============ HISTORY ============ -->
+  <div class="page" id="page-history">
+    <div class="pagetitle">Scan History</div>
+    <p class="pagesub">Your past scans, always close at hand.</p>
+    <div class="row" style="margin-top:14px">
+      <input placeholder="Search scans…" id="histSearch" oninput="renderHistory()">
+    </div>
+    <div id="historyList"></div>
+  </div>
+
+  <!-- ============ SAVED ============ -->
+  <div class="page" id="page-saved">
+    <div class="pagetitle">Saved Items</div>
+    <p class="pagesub">Keep the finds you're watching.</p>
+    <div class="section-label" style="margin-top:14px">Watchlist</div>
+    <div id="watchList"></div>
+    <div class="section-label">Saved</div>
+    <div id="savedList"></div>
+  </div>
+
+  <!-- ============ SALES ============ -->
+  <div class="page" id="page-sales">
+    <div class="pagetitle">Sales Tracker</div>
+    <p class="pagesub">Record what you've actually bought and sold.</p>
+    <div class="card" id="salesStatsCard" style="display:none">
+      <h2>Your performance</h2>
+      <canvas id="profitChart" style="width:100%;height:140px;margin-top:12px"></canvas>
+      <div class="row" style="justify-content:space-between;margin-top:10px">
+        <div><div class="lab" style="font-size:11px;color:var(--muted)">Avg profit</div><div class="val" id="avgProfit" style="font-size:18px;font-weight:750">$0</div></div>
+        <div><div class="lab" style="font-size:11px;color:var(--muted)">Avg margin</div><div class="val" id="avgMargin" style="font-size:18px;font-weight:750">0%</div></div>
+        <div><div class="lab" style="font-size:11px;color:var(--muted)">Sales</div><div class="val" id="saleCount" style="font-size:18px;font-weight:750">0</div></div>
+      </div>
+    </div>
+    <div id="salesList"></div>
+    <button class="btn block" style="margin-top:14px" onclick="addSale()">+ Add a sale</button>
+  </div>
+
+  <!-- ============ SETTINGS ============ -->
+  <div class="page" id="page-settings">
+    <div class="pagetitle">Settings</div>
+    <p class="pagesub">Make it yours.</p>
+    <div class="section-label">Subscription</div>
+    <div class="card" id="subCard"></div>
+    <div class="section-label">Reselling Preferences</div>
+    <div class="card">
+      <div class="inputgroup">
+        <label>Default selling platform</label>
+        <select id="platform" onchange="updateCalc()">
+          <option value="ebay">eBay</option>
+          <option value="mercari">Mercari</option>
+          <option value="poshmark">Poshmark</option>
+          <option value="facebook">Facebook Marketplace</option>
+          <option value="etsy">Etsy</option>
+        </select>
+      </div>
+      <div class="inputgroup">
+        <label>Default shipping method</label>
+        <select id="shipMethod" onchange="updateCalc()">
+          <option value="ground">Ground (~$5)</option>
+          <option value="priority">Priority (~$8)</option>
+          <option value="free">Free shipping (buyer pays)</option>
+        </select>
+      </div>
+      <div class="inputgroup">
+        <label>Currency</label>
+        <select id="currency" onchange="setCurrency()">
+          <option value="USD">$ — US Dollar</option>
+          <option value="EUR">€ — Euro</option>
+          <option value="GBP">£ — British Pound</option>
+          <option value="CAD">C$ — Canadian Dollar</option>
+          <option value="MXN">MX$ — Peso</option>
+        </select>
+      </div>
+    </div>
+    <div class="section-label">Appearance</div>
+    <div class="card">
+      <div class="setting"><div><div class="st-l">Dark mode</div><div class="st-s">Easy on the eyes at night</div></div><div class="switch" id="darkSwitch" onclick="toggleDark()"></div></div>
+    </div>
+    <div class="section-label">Notifications</div>
+    <div class="card">
+      <div class="setting"><div><div class="st-l">Price drop alerts</div></div><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="setting"><div><div class="st-l">Watchlist alerts</div></div><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="setting"><div><div class="st-l">Daily scan reset</div></div><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="setting"><div><div class="st-l">Sales reminders</div></div><div class="switch" onclick="this.classList.toggle('on')"></div></div>
+    </div>
+    <div class="section-label">Account & Sync</div>
+    <div class="card" id="acctCard">
+      <div id="acctState"></div>
+      <div id="acctForm" class="hidden">
+        <p class="sub" style="font-size:12.5px;margin-bottom:10px">Create an account to sync your scans, saved items & sales across devices.</p>
+        <div class="inputgroup"><label>Email</label><input id="acctEmail" type="email" placeholder="you@email.com"></div>
+        <div class="inputgroup"><label>Password</label><input id="acctPass" type="password" placeholder="at least 6 characters"></div>
+        <div class="two-col" style="margin-top:12px">
+          <button class="btn" onclick="loginUser()">Log in</button>
+          <button class="btn ghost" onclick="registerUser()">Sign up</button>
+        </div>
+        <p class="sub" style="font-size:11.5px;margin-top:8px">Needs the backend running (see files/backend/README.md). Works offline otherwise.</p>
+      </div>
+    </div>
+    <div class="section-label">Account</div>
+    <div class="card">
+      <div class="setting"><div><div class="st-l">Pro subscription</div><div class="st-s" id="acctPlan">Free plan</div></div><button class="smallbtn" onclick="go('upgrade')">Manage</button></div>
+      <div class="setting"><div><div class="st-l">Privacy & security</div></div><button class="smallbtn">Open</button></div>
+      <div class="setting"><div><div class="st-l">Help & support</div></div><button class="smallbtn">Open</button></div>
+      <div class="setting"><div><div class="st-l">About</div></div><div class="tiny">v1.0.0</div></div>
+    </div>
+    <div class="section-label">Data</div>
+    <div class="card">
+      <div class="setting"><div><div class="st-l">Clear all data</div><div class="st-s">Delete scans, saved items, sales & reset plan</div></div><button class="smallbtn" style="color:var(--skip);border-color:var(--skip)" onclick="clearAllData()">Clear</button></div>
+    </div>
+  </div>
+
+  <!-- ============ UPGRADE ============ -->
+  <div class="page" id="page-upgrade">
+    <div class="pagetitle">Go Pro</div>
+    <p class="pagesub">Make faster, smarter buying decisions.</p>
+    <div class="pro-banner">
+      <h2>Picflip Pro</h2>
+      <div class="price"><span id="upgradePrice">$7.99</span><span> / month</span></div>
+      <ul>
+        <li>Unlimited scans</li>
+        <li>Detailed resale analysis</li>
+        <li>Detailed price history & trends</li>
+        <li>Selling fee & shipping estimates</li>
+        <li>Profit margin & time-to-sell</li>
+        <li>Watchlists & price alerts</li>
+        <li>Sales tracking & advanced filters</li>
+      </ul>
+    </div>
+    <button class="btn block" style="margin-top:16px" onclick="go('checkout')">Subscribe — $7.99/mo</button>
+    <button class="btn ghost block" style="margin-top:10px" onclick="toast('Restore purchases — will check your App Store account.')">Restore Purchases</button>
+    <p class="tiny" style="text-align:center;margin-top:12px">Managed through your app store subscription. Cancel anytime.</p>
+  </div>
+
+  <!-- ============ CHECKOUT ============ -->
+  <div class="page" id="page-checkout">
+    <div class="row" style="margin-top:16px;align-items:center">
+      <button class="iconbtn" onclick="go('upgrade')" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div style="flex:1"><div class="pagetitle" style="margin-top:0">Checkout</div></div>
+      <span class="chip" style="font-size:12px">Secure</span>
+    </div>
+
+    <div class="card" id="checkoutSummary" style="margin-top:16px"></div>
+
+    <div class="card">
+      <h2>Payment details</h2>
+      <div class="inputgroup">
+        <label>Card number</label>
+        <input id="cardNum" inputmode="numeric" placeholder="4242 4242 4242 4242" oninput="fmtCard(this)">
+      </div>
+      <div class="grid g2">
+        <div class="inputgroup">
+          <label>Expiry</label>
+          <input id="cardExp" inputmode="numeric" placeholder="MM/YY" oninput="fmtExp(this)">
+        </div>
+        <div class="inputgroup">
+          <label>CVC</label>
+          <input id="cardCvc" inputmode="numeric" placeholder="123" maxlength="4" oninput="this.value=this.value.replace(/\D/g,'')">
+        </div>
+      </div>
+      <div class="inputgroup">
+        <label>Name on card</label>
+        <input id="cardName" placeholder="Full name">
+      </div>
+    </div>
+
+    <button class="btn block" style="margin-top:16px" onclick="processPayment()">Pay $7.99 & Activate Pro</button>
+    <p class="tiny" style="text-align:center;margin-top:10px" id="payNote">This is a demo checkout — no real charge is made.</p>
+  </div>
+
+  <div class="nav">
+    <button id="nav-home" onclick="go('home')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg></span>Home</button>
+    <button id="nav-history" onclick="go('history')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>History</button>
+    <button id="nav-scanner" onclick="go('scanner')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7.5 6H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2.5z"/><circle cx="12" cy="13" r="3.5"/></svg></span>Scan</button>
+    <button id="nav-saved" onclick="go('saved')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.8 1.6 7L12 17.6 5.8 21l1.6-7L2 9.3l7.1-.7z"/></svg></span>Saved</button>
+    <button id="nav-sales" onclick="go('sales')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 3 6-8"/><path d="M15 6h3v3"/></svg></span>Sales</button>
+    <button id="nav-settings" onclick="go('settings')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Settings</button>
+  </div>
+</div>
+<div id="toast" style="position:fixed;bottom:92px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:11px 18px;border-radius:14px;font-weight:700;font-size:13px;opacity:0;transition:.3s;z-index:100;max-width:90%;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.2)"></div>
+
+<!-- ===== ONBOARDING MODAL ===== -->
+<div id="onboard" style="position:fixed;inset:0;z-index:150;background:rgba(11,18,32,.6);display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(3px)">
+  <div style="background:var(--surface);border-radius:18px;max-width:360px;width:100%;padding:26px 22px;box-shadow:var(--shadow)">
+    <div style="font-size:34px;margin-bottom:10px">👋</div>
+    <h2 style="margin-bottom:6px">Welcome to Picflip</h2>
+    <p class="sub" style="margin-bottom:18px">A 3-step way to decide before you buy.</p>
+    <div style="display:flex;gap:12px;margin-bottom:14px">
+      <div style="width:38px;height:38px;border-radius:10px;background:var(--surface2);display:grid;place-items:center;font-weight:700;color:var(--primary)">1</div>
+      <div><div style="font-weight:700;font-size:14px">Scan an item</div><div class="sub" style="font-size:12.5px">Snap a photo or upload one.</div></div>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:14px">
+      <div style="width:38px;height:38px;border-radius:10px;background:var(--surface2);display:grid;place-items:center;font-weight:700;color:var(--primary)">2</div>
+      <div><div style="font-weight:700;font-size:14px">See its value</div><div class="sub" style="font-size:12.5px">Resale range, demand, fees & profit.</div></div>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:20px">
+      <div style="width:38px;height:38px;border-radius:10px;background:var(--surface2);display:grid;place-items:center;font-weight:700;color:var(--primary)">3</div>
+      <div><div style="font-weight:700;font-size:14px">Buy or skip</div><div class="sub" style="font-size:12.5px">Get a clear recommendation & where to sell.</div></div>
+    </div>
+    <button class="btn block" onclick="closeOnboard()">Got it</button>
+  </div>
+</div>
+
+<script>
+/* ============ STATE ============ */
+const CURR = {"USD":["$","US$"],"EUR":["€","€"],"GBP":["£","£"],"CAD":["C$","C$"],"MXN":["MX$","MX$"]};
+let state={pro:false, scans:10, cur:"USD", history:[], saved:[], sales:[], current:null, platform:"ebay", ship:"ground", onboarded:false, email:"", watchlist:[], alerts:[], bundleMode:false, bundle:[], session:null};
+const STORE_KEY="picflip_state";
+function save(){
+  try{localStorage.setItem(STORE_KEY,JSON.stringify(state));}catch(e){/* storage unavailable */}
+  if(state.session)syncPush();
+}
+function load(){
+  try{const raw=localStorage.getItem(STORE_KEY);if(raw){const s=JSON.parse(raw);
+    state.pro=!!s.pro; state.cur=s.cur||"USD"; state.platform=s.platform||"ebay"; state.ship=s.ship||"ground";
+    state.history=Array.isArray(s.history)?s.history:[];
+    state.saved=Array.isArray(s.saved)?s.saved:[];
+    state.sales=Array.isArray(s.sales)?s.sales:[];
+    state.watchlist=Array.isArray(s.watchlist)?s.watchlist:[];
+    state.alerts=Array.isArray(s.alerts)?s.alerts:[];
+    state.onboarded=!!s.onboarded; state.email=s.email||"";
+    state.session=(s.session&&s.session.token&&s.session.email)?s.session:null;
+    state.scans=state.pro?999:(typeof s.scans==="number"?s.scans:10);
+  }}catch(e){/* ignore corrupted state */}
+}
+/* Backend for accounts + cross-device sync.
+   Point ?api= at your server, e.g. reselling-app-prototype.html?api=https://your-server.com
+   Defaults to a local backend on port 3000. Everything still works offline if it's unreachable. */
+const API = new URLSearchParams(location.search).get("api") || "http://localhost:3000";
+
+async function apiCall(path, opts={}){
+  const headers={...opts.headers||{}};
+  if(opts.body)headers["Content-Type"]="application/json";
+  if(state.session)headers["Authorization"]="Bearer "+state.session.token;
+  const r=await fetch(API+path,{...opts,headers});
+  return r.json();
+}
+async function registerUser(){
+  const email=document.getElementById("acctEmail").value.trim();
+  const pw=document.getElementById("acctPass").value;
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return toast("Enter a valid email");
+  if(pw.length<6)return toast("Password must be at least 6 characters");
+  try{
+    const r=await apiCall("/api/register",{method:"POST",body:JSON.stringify({email,password:pw})});
+    if(r.error)return toast(r.error);
+    state.session={token:r.token,email:r.email};syncApply(r.state||{});save();renderSettings();toast("Account created ✓");
+  }catch(e){toast("Can't reach server — are you running backend/server.js?");}
+}
+async function loginUser(){
+  const email=document.getElementById("acctEmail").value.trim();
+  const pw=document.getElementById("acctPass").value;
+  if(!email||!pw)return toast("Enter your email and password");
+  try{
+    const r=await apiCall("/api/login",{method:"POST",body:JSON.stringify({email,password:pw})});
+    if(r.error)return toast(r.error);
+    state.session={token:r.token,email:r.email};syncApply(r.state||{});save();renderSettings();toast("Welcome back, "+r.email);
+  }catch(e){toast("Can't reach server — are you running backend/server.js?");}
+}
+async function logoutUser(){
+  state.session=null;save();renderSettings();toast("Signed out (data kept on this device)");
+}
+/* Merge cloud state into local, keeping the newer of each list. */
+function syncApply(cloud){
+  const merge=(localArr,cloudArr)=>{
+    const map=new Map();(cloudArr||[]).forEach(x=>map.set(x.date||Math.random(),x));
+    (localArr||[]).forEach(x=>{const k=x.date||Math.random();if(!map.has(k))map.set(k,x);});
+    return [...map.values()];
+  };
+  state.history=merge(state.history,cloud.history);
+  state.saved=merge(state.saved,cloud.saved);
+  state.watchlist=merge(state.watchlist,cloud.watchlist);
+  state.sales=merge(state.sales,cloud.sales);
+  if(cloud.pro)state.pro=true;
+  if(cloud.email)state.email=cloud.email;
+}
+let syncTimer=null;
+function syncPush(){
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(async()=>{
+    try{
+      const payload={history:state.history,saved:state.saved,watchlist:state.watchlist,sales:state.sales,pro:state.pro,email:state.email};
+      await apiCall("/api/state",{method:"PUT",body:JSON.stringify({state:payload})});
+    }catch(e){/* offline — will retry on next save */}
+  },400);
+}
+async function syncPull(){
+  if(!state.session)return;
+  try{const r=await apiCall("/api/state");if(r.state)syncApply(r.state);renderHome();renderSaved();renderHistory();renderSales();}
+  catch(e){toast("Sync unavailable (offline)");}
+}
+
+const FEE_RATE={"ebay":0.135,"mercari":0.10,"poshmark":0.20,"facebook":0.0,"etsy":0.165};
+const PLATFORM_NAME={"ebay":"eBay","mercari":"Mercari","poshmark":"Poshmark","facebook":"Facebook Marketplace","etsy":"Etsy"};
+const SHIP_COST={"ground":5,"priority":8,"free":0};
+const PLATFORM_BRAND={"ebay":["eBay","#e53238"],"mercari":["M","#f26b3a"],"poshmark":["P","#cb2e6d"],"facebook":["f","#1877f2"],"etsy":["E","#f1641e"]};
+/* Best-selling platforms by category. Each: [platform, pros, why-best-score] */
+const CATEGORY_PLATFORMS={
+ "Sneakers":[["ebay","Largest sneaker buyer base, global bids",98],["poshmark","Great for apparel & footwear buyers",84],["mercari","Easy listing, quick casual sales",76]],
+ "Apparel":[["poshmark","Purpose-built for clothing",94],["ebay","Huge reach, good for vintage",88],["mercari","Fast, simple listings",78]],
+ "Outerwear":[["ebay","Broad national reach for outerwear",92],["poshmark","Strong for jackets & coats",86],["mercari","Quick everyday sales",74]],
+ "Bags":[["ebay","Best for authentic & vintage bags",93],["poshmark","Fashion-forward buyer pool",85],["mercari","Fast resale for accessories",73]],
+ "Watches":[["ebay","Largest watch marketplace online",95],["facebook","Local cash sales, no fees",70],["mercari","Decent for entry watches",65]],
+ "Jewelry":[["ebay","Top platform for jewelry resale",92],["etsy","Good for vintage & handmade appeal",74],["facebook","Local sales, no fees",62]],
+ "Gaming":[["ebay","Biggest retro & console market",97],["facebook","Local pickups for bulk lots",78],["mercari","Fast console/controller sales",80]],
+ "Toys":[["ebay","Collectors pay top dollar",95],["facebook","Local bundles & large lots",76],["mercari","Quick sales for popular sets",74]],
+ "Books":[["ebay","Best for collectible editions",90],["mercari","Cheap shipping, easy sales",72],["facebook","Local, no fees on heavy books",60]],
+ "Cameras":[["ebay","Strongest film/analog camera market",96],["facebook","Local gear sales, no fees",68],["mercari","Good for camera accessories",72]],
+ "Furniture":[["facebook","Best for bulky items — local pickup",96],["ebay","Works when shipping is practical",70],["mercari","Local-minded buyers",60]],
+ "Home":[["facebook","Local decor sells fast",92],["ebay","Broader reach for brand pieces",78],["mercari","Easy decor listings",66]],
+ "Kitchen":[["facebook","Local kitchenware moves quickly",90],["ebay","Good for branded/vintage",74],["mercari","Simple everyday sales",62]],
+ "default":[["ebay","Broadest reach of any marketplace",85],["mercari","Fast, low-effort listings",75],["facebook","No fees, local cash",70]]
+};
+const SAMPLES=[
+ {icon:"👟",name:"Nike Air Max 90",brand:"Nike",model:"Air Max 90",cat:"Sneakers",cond:"Good (7/10)",resale:[70,90],demand:85,difficulty:"Easy",time:"1–2 weeks",trend:"up",fees:0.135,shipping:8,details:"Classic silhouette, strong resale demand in men's sizes. DS pairs sell highest."},
+ {icon:"🧥",name:"North Face Nuptse Jacket",brand:"The North Face",model:"1996 Nuptse",cat:"Outerwear",cond:"Great (8/10)",resale:[110,150],demand:78,difficulty:"Easy",time:"1–3 weeks",trend:"stable",fees:0.135,shipping:10,details:"Highly sought winter jacket. Color & size heavily influence value."},
+ {icon:"📚",name:"Hardcover Coffee-Table Book",brand:"—",model:"—",cat:"Books",cond:"Good (7/10)",resale:[15,30],demand:45,difficulty:"Moderate",time:"2–4 weeks",trend:"flat",fees:0.135,shipping:6,details:"Only collectible editions (signed, rare, in-demand authors) resell well."},
+ {icon:"🎮",name:"GameCube Controller",brand:"Nintendo",model:"WaveBird",cat:"Gaming",cond:"Fair (6/10)",resale:[40,65],demand:80,difficulty:"Easy",time:"1–2 weeks",trend:"up",fees:0.135,shipping:6,details:"Retro gaming accessories are in demand. Test fully before listing."},
+ {icon:"💍",name:"Gold Ring (14k)",brand:"—",model:"—",cat:"Jewelry",cond:"Great (8/10)",resale:[120,180],demand:70,difficulty:"Moderate",time:"2–5 weeks",trend:"stable",fees:0.135,shipping:5,details:"Value tied to gold weight & purity. Weigh and verify hallmark."},
+ {icon:"🪑",name:"Mid-Century Side Table",brand:"—",model:"—",cat:"Furniture",cond:"Good (7/10)",resale:[50,95],demand:55,difficulty:"Hard",time:"3–8 weeks",trend:"flat",fees:0.135,shipping:0,details:"Large items are harder to ship. Best sold locally."},
+ {icon:"⌚",name:"Casio Vintage Watch",brand:"Casio",model:"A158W",cat:"Watches",cond:"Good (7/10)",resale:[18,35],demand:68,difficulty:"Easy",time:"1–3 weeks",trend:"up",fees:0.135,shipping:4,details:"Nostalgic digital watches are trendy. Clean dial & working battery boost value."},
+ {icon:"🎽",name:"Vintage Graphic Tee",brand:"—",model:"—",cat:"Apparel",cond:"Great (8/10)",resale:[25,55],demand:72,difficulty:"Easy",time:"1–2 weeks",trend:"up",fees:0.135,shipping:4,details:"Band & sports tees resell well. Rare graphics and no fading command top dollar."},
+ {icon:"📷",name:"Analog Film Camera",brand:"Canon",model:"AE-1",cat:"Cameras",cond:"Fair (6/10)",resale:[60,120],demand:75,difficulty:"Moderate",time:"2–4 weeks",trend:"up",fees:0.135,shipping:7,details:"Film cameras are booming. Test shutter & light meter before listing."},
+ {icon:"🎁",name:"LEGO Set (Retired)",brand:"LEGO",model:"—",cat:"Toys",cond:"New (9/10)",resale:[80,140],demand:82,difficulty:"Easy",time:"1–3 weeks",trend:"up",fees:0.135,shipping:8,details:"Retired sets appreciate fast. Complete sealed boxes sell highest."},
+ {icon:"👜",name:"Coach Handbag",brand:"Coach",model:"—",cat:"Bags",cond:"Good (7/10)",resale:[55,95],demand:60,difficulty:"Moderate",time:"2–5 weeks",trend:"stable",fees:0.135,shipping:8,details:"Authentic vintage Coach resells steadily. Check for the creed patch."},
+];
+/* Common everyday items — used when a photo is scanned so prices stay realistic. */
+const COMMON=[
+ {icon:"☕",name:"Ceramic Coffee Mug",brand:"—",model:"—",cat:"Kitchen",cond:"Good (7/10)",resale:[4,10],demand:35,difficulty:"Hard",time:"4–8 weeks",trend:"flat",fees:0.135,shipping:6,details:"Plain mugs sell for little. Only rare, branded or vintage designs command more."},
+ {icon:"🏺",name:"Decorative Vase",brand:"—",model:"—",cat:"Home",cond:"Good (7/10)",resale:[8,20],demand:40,difficulty:"Moderate",time:"3–6 weeks",trend:"flat",fees:0.135,shipping:8,details:"Weight and fragility raise shipping. Value depends on brand and style."},
+ {icon:"📦",name:"Generic Storage Box",brand:"—",model:"—",cat:"Home",cond:"Fair (6/10)",resale:[3,8],demand:25,difficulty:"Hard",time:"4–8 weeks",trend:"flat",fees:0.135,shipping:5,details:"Everyday storage sells cheaply and slowly. Best sold bundled."},
+ {icon:"🧺",name:"Woven Basket",brand:"—",model:"—",cat:"Home",cond:"Good (7/10)",resale:[6,15],demand:38,difficulty:"Moderate",time:"3–6 weeks",trend:"flat",fees:0.135,shipping:6,details:"Plain baskets are low value. Handmade or vintage ones sell better."},
+ {icon:"🖼️",name:"Decorative Frame",brand:"—",model:"—",cat:"Home",cond:"Good (7/10)",resale:[5,12],demand:30,difficulty:"Hard",time:"4–7 weeks",trend:"flat",fees:0.135,shipping:6,details:"Frames resell slowly. Antique or designer frames are the exception."},
+ {icon:"🧸",name:"Stuffed Toy",brand:"—",model:"—",cat:"Toys",cond:"Fair (6/10)",resale:[5,15],demand:35,difficulty:"Moderate",time:"3–6 weeks",trend:"flat",fees:0.135,shipping:5,details:"Common plush toys have low resale. Rare or collectible lines are worth more."},
+];
+
+/* ============ NAV ============ */
+const PAGES=["home","scanner","result","history","saved","sales","settings","upgrade","checkout"];
+const NAVMAP={home:"home",scanner:"scanner",result:"scanner",history:"history",saved:"saved",sales:"sales",settings:"settings",upgrade:"settings",checkout:"settings"};
+function go(p){PAGES.forEach(x=>document.getElementById("page-"+x).classList.toggle("active",x===p));
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+  const n=document.getElementById("nav-"+NAVMAP[p]); if(n)n.classList.add("active");
+  window.scrollTo(0,0);
+  if(p!=="scanner")stopCamera();
+  if(p==="home")renderHome(); if(p==="history")renderHistory(); if(p==="saved")renderSaved(); if(p==="sales")renderSales(); if(p==="settings")renderSettings(); if(p==="checkout")renderCheckout();
+}
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.style.opacity=1;clearTimeout(t._x);t._x=setTimeout(()=>t.style.opacity=0,2200);}
+
+/* ============ SCANNER ============ */
+let camStream=null; let capturedData=null;
+function renderSamples(){document.getElementById("samples").innerHTML=SAMPLES.map((s,i)=>
+  `<button class="smallbtn" onclick="scanSample(${i})">${s.name.split(' ').slice(0,2).join(' ')}</button>`).join("");}
+
+/* --- Real camera --- */
+function camError(msg){
+  document.getElementById("camIcon").innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="var(--skip)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v9"/><path d="M12 18h.01"/><path d="M10.3 4.5 2.9 17a2 2 0 0 0 1.7 3h14.8a2 2 0 0 0 1.7-3L13.7 4.5a2 2 0 0 0-3.4 0z"/></svg><div style="font-size:12px;font-weight:600;color:var(--skip)">${msg}</div>`;
+}
+function resetCamIcon(){
+  document.getElementById("camIcon").innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7.5 6H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2.5z"/><circle cx="12" cy="13" r="3.5"/></svg><div style="font-size:13px;font-weight:600">Point at the item</div><div style="font-size:11.5px">Fill the frame for best results</div>`;
+}
+async function toggleCamera(){
+  const vid=document.getElementById("cameraFeed");
+  if(camStream){ stopCamera(); return; }
+  if(!window.isSecureContext){camError("Camera needs HTTPS or localhost. Run a local server (see below) and open this file.");return;}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){camError("Camera not supported in this browser.");return;}
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280},height:{ideal:960}},audio:false});
+    camStream=stream; vid.srcObject=stream; vid.style.display="block";
+    document.getElementById("camIcon").style.display="none";
+    document.getElementById("photoPreview").style.display="none";
+    document.getElementById("crossHairEl").style.display="block";
+    const btn=document.getElementById("camBtn");btn.textContent="Capture Photo";
+    toast("Camera on — point at the item and tap Capture");
+  }catch(e){
+    let m;
+    if(e.name==="NotAllowedError")m="Please allow camera access.";
+    else if(e.name==="NotFoundError")m="No camera found on this device.";
+    else if(e.name==="NotReadableError")m="Camera in use by another app.";
+    else if(e.name==="SecurityError")m="Camera blocked — open over HTTPS/localhost.";
+    else m="Check camera permissions.";
+    camError("Couldn't open camera: "+m);
+  }
+}
+function stopCamera(){
+  if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}
+  const vid=document.getElementById("cameraFeed");vid.style.display="none";
+  document.getElementById("camIcon").style.display="";
+  document.getElementById("photoPreview").style.display="none";
+  const c=document.getElementById("crossHairEl");if(c)c.style.display="";
+  const btn=document.getElementById("camBtn");btn.textContent="Open Camera";
+}
+function capturePhoto(){
+  const vid=document.getElementById("cameraFeed");
+  const canvas=document.getElementById("snapCanvas");
+  canvas.width=vid.videoWidth||1280; canvas.height=vid.videoHeight||960;
+  canvas.getContext("2d").drawImage(vid,0,0,canvas.width,canvas.height);
+  capturedData=canvas.toDataURL("image/jpeg",0.92);
+  stopCamera();
+  document.getElementById("photoImg").src=capturedData;
+  document.getElementById("photoPreview").style.display="block";
+  document.getElementById("camBtn").textContent="Analyze Photo";
+  toast("Photo captured. Tap Analyze.");
+}
+function cancelPhoto(){
+  capturedData=null;
+  document.getElementById("photoPreview").style.display="none";
+  document.getElementById("camBtn").textContent="Open Camera";
+}
+
+/* --- Upload / sample / analyze --- */
+function handleUpload(e){const f=e.target.files[0];if(!f)return;const reader=new FileReader();
+  reader.onload=ev=>{capturedData=ev.target.result;
+    document.getElementById("photoImg").src=capturedData;
+    document.getElementById("photoPreview").style.display="block";
+    stopCamera();
+    document.getElementById("camBtn").textContent="Analyze Photo";
+  };reader.readAsDataURL(f);}
+function scanSample(i){stopCamera();doScan(SAMPLES[i]);}
+function scanNow(){
+  if(camStream){capturePhoto();return;}
+  if(capturedData){const item=COMMON[Math.floor(Math.random()*COMMON.length)];doScan(item,capturedData);cancelPhoto();return;}
+  toggleCamera();
+}
+function doScan(item,img){
+  if(!state.pro && state.scans<=0){toast("Daily scan limit reached. Upgrade to Pro for unlimited scans.");return;}
+  if(!state.pro){state.scans--;renderPill();save();}
+  stopCamera();
+  document.getElementById("scanCard").classList.add("hidden");
+  const box=document.getElementById("scanningBox");box.classList.remove("hidden");
+  const statuses=["Identifying object…","Matching market data…","Estimating resale value…","Calculating fees…"];
+  let step=0;const fill=document.getElementById("scanFill");fill.style.width="0%";
+  const iv=setInterval(()=>{step++;fill.style.width=(step*25)+"%";
+    if(step<statuses.length){document.getElementById("scanStatus").textContent=statuses[step];}
+    if(step>=4){clearInterval(iv);setTimeout(()=>{box.classList.add("hidden");document.getElementById("scanCard").classList.remove("hidden");
+      resetScanFrame();
+      if(state.bundleMode){addToBundle(item);box.classList.add("hidden");document.getElementById("scanCard").classList.remove("hidden");go('scanner');}
+      else {showResult(item,img);go('result');}
+      },300);}},650);
+}
+function resetScanFrame(){
+  document.getElementById("photoPreview").style.display="none";
+  document.getElementById("camIcon").style.display="";
+  document.getElementById("camBtn").textContent="Open Camera";
+  capturedData=null;
+}
+function renderPill(){document.getElementById("scanPillTxt").textContent=state.pro?"Unlimited":`${state.scans} left today`;}
+function bestPlatformFor(item){const recs=CATEGORY_PLATFORMS[item.cat]||CATEGORY_PLATFORMS.default;return recs[0][0];}
+function showResult(item,img){item.purchase=promptDefault(item);item.feesRate=item.fees;item.ship=item.shipping;
+  state.platform=bestPlatformFor(item); item.feesRate=FEE_RATE[state.platform];
+  if(img)item.image=img; state.current=item; state.history.unshift({...item,date:Date.now()}); renderResult(); save();}
+function promptDefault(item){return Math.round(item.resale[0]*0.4);}
+function toCurrency(v,dec=0){const c=CURR[state.cur][0];return c+v.toLocaleString(undefined,{minimumFractionDigits:dec,maximumFractionDigits:dec});}
+
+/* ============ BUNDLE SCANNER ============ */
+function toggleBundle(){
+  state.bundleMode=!state.bundleMode;
+  const btn=document.getElementById("bundleBtn");
+  btn.textContent=state.bundleMode?"Exit bundle mode":"Scan multiple items (bundle)";
+  btn.classList.toggle("btn",!state.bundleMode);btn.classList.toggle("btn",true);
+  document.getElementById("bundleBox").classList.toggle("hidden",!state.bundleMode);
+  if(state.bundleMode){state.bundle=[];renderBundle();toast("Bundle mode on — scan items to add them");}
+}
+function addToBundle(item){state.bundle.push(item);renderBundle();toast(item.name+" added");}
+function clearBundle(){state.bundle=[];renderBundle();}
+function renderBundle(){
+  const bl=document.getElementById("bundleList");
+  const tot=state.bundle.reduce((a,b)=>a+((b.resale[0]+b.resale[1])/2),0);
+  document.getElementById("bundleTotal").textContent=toCurrency(tot);
+  bl.innerHTML=state.bundle.length?state.bundle.map((b,i)=>`
+    <div class="row" style="padding:6px 0">
+      <div class="thumb" style="width:34px;height:34px;font-size:15px;font-weight:700;color:var(--primary)">${initial(b.name)}</div>
+      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">${b.name}</div></div>
+      <b>${toCurrency((b.resale[0]+b.resale[1])/2)}</b>
+      <button class="iconbtn" style="width:28px;height:28px" onclick="state.bundle.splice(${i},1);renderBundle()">×</button>
+    </div>`).join(""):`<div class="empty">Scan items to build your bundle.</div>`;
+}
+
+/* ============ RESULT ============ */
+function renderResult(){
+  const it=state.current;if(!it)return;
+  const buyP=+document.getElementById("buyPrice")?.value||it.purchase;
+  const estLo=it.resale[0],estHi=it.resale[1];
+  const fees=Math.round((estLo+estHi)/2*it.feesRate);
+  const ship=SHIP_COST[state.ship];
+  const sellMid=(estLo+estHi)/2;
+  const profit=Math.round(sellMid-fees-ship-buyP);
+  const margin=profit/sellMid*100;
+  const rec=profit>=25&&it.demand>=70?"buy":(profit>=5&&it.demand>=45?"maybe":"skip");
+  const cur=CURR[state.cur][0];
+  const top=document.getElementById("resultTop");
+  const thumbImg=it.image?`<img src="${it.image}" style="width:100%;height:100%;object-fit:cover">`:`<span style="font-weight:700;color:var(--primary)">${initial(it.name)}</span>`;
+  top.innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;margin-top:18px">
+      <div class="thumb" style="width:60px;height:60px;font-size:24px">${thumbImg}</div>
+      <div style="flex:1;min-width:0">
+        <h1 style="font-size:20px;font-weight:700;letter-spacing:-.02em">${it.name}</h1>
+        <div class="row" style="margin-top:5px;gap:6px;flex-wrap:wrap">
+          <span class="tag">${it.brand}</span>
+          ${it.model!=="—"?`<span class="tag">${it.model}</span>`:""}
+          <span class="tag">${it.cat}</span>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="margin-top:10px;gap:8px;flex-wrap:wrap">
+      <span class="chip">${PLATFORM_NAME[state.platform]}</span>
+      <span class="chip badge-est">Estimates</span>
+      <span class="chip">${it.cond}</span>
+    </div>
+    <div class="rec ${rec}"><span class="rec-badge">${rec==="buy"?"BUY":rec==="maybe"?"MAYBE":"SKIP"}</span><div style="flex:1">Recommendation<span class="small">Based on profit, demand, and market fit</span></div></div>
+    <div class="sell-callout" style="margin-top:14px;background:var(--grad);color:#fff;border-radius:14px;padding:14px 16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="width:34px;height:34px;border-radius:8px;background:#fff;color:${PLATFORM_BRAND[state.platform][1]};display:grid;place-items:center;font-weight:800;font-size:16px;flex-shrink:0">${PLATFORM_BRAND[state.platform][0]}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;font-weight:600;opacity:.9;text-transform:uppercase;letter-spacing:.04em">Best place to sell</div>
+          <div style="font-weight:700;font-size:17px">${PLATFORM_NAME[state.platform]}</div>
+        </div>
+        <span style="font-size:12px;font-weight:600;opacity:.9">auto-picked</span>
+      </div>
+    </div>
+    <div class="reason"><b>Why ${rec==="buy"?"BUY":rec==="maybe"?"MAYBE":"SKIP"}:</b> ${reasonText(it,profit,rec)}</div>`;
+  if(rec==="buy"){top.insertAdjacentHTML("beforeend",`<button class="btn block" style="margin-top:12px" onclick="saveItem()">Save this find</button>`);}
+
+  const body=document.getElementById("resultBody");
+  body.innerHTML=`
+    <div class="metrics">
+      <div class="metric"><div class="lab">Est. resale</div><div class="val purple">${cur}${estLo}–${cur}${estHi}</div><div class="tiny">mid ${cur}${sellMid.toFixed(0)}</div></div>
+      <div class="metric"><div class="lab">Demand</div><div class="val">${it.demand}%</div><div class="tiny">${demandLabel(it.demand)}</div></div>
+      <div class="metric"><div class="lab">Est. fees</div><div class="val red">−${cur}${fees}</div><div class="tiny">${(it.feesRate*100).toFixed(1)}% ${PLATFORM_NAME[state.platform]}</div></div>
+      <div class="metric"><div class="lab">Est. shipping</div><div class="val red">−${cur}${ship}</div><div class="tiny">${state.ship}</div></div>
+      <div class="metric"><div class="lab">Purchase price</div><div class="val">${cur}${buyP}</div><div class="tiny">tap to edit</div></div>
+      <div class="metric"><div class="lab">Est. profit</div><div class="val ${profit>=0?"green":"red"}">${cur}${profit}</div><div class="tiny">margin ${margin.toFixed(0)}%</div></div>
+    </div>
+
+    <div class="card">
+      <h2>Edit purchase price</h2>
+      <p class="sub" style="font-size:12px;margin-top:4px">How much would you pay for it? Profits update instantly.</p>
+      <div class="currency inputgroup"><span class="cur">${cur}</span>
+        <input type="number" id="buyPrice" value="${buyP}" min="0" oninput="renderResult()"></div>
+      <div class="inputgroup">
+        <label>Selling platform</label>
+        <select id="resPlatform" onchange="state.platform=this.value;state.current.feesRate=FEE_RATE[this.value];renderResult();save()">
+          ${Object.entries(PLATFORM_NAME).map(([k,v])=>`<option value="${k}" ${k===state.platform?"selected":""}>${v}</option>`).join("")}
+        </select>
+      </div>
+      <div class="inputgroup">
+        <label>Shipping</label>
+        <select id="resShip" onchange="state.ship=this.value;renderResult();save()">
+          <option value="ground" ${state.ship==="ground"?"selected":""}>Ground (~$5)</option>
+          <option value="priority" ${state.ship==="priority"?"selected":""}>Priority (~$8)</option>
+          <option value="free" ${state.ship==="free"?"selected":""}>Free shipping</option>
+        </select>
+      </div>
+      <div class="two-col">
+        <button class="btn block" onclick="saveItem()">Save</button>
+        <button class="btn ghost block" onclick="watchItem()">Watch</button>
+      </div>
+      <button class="btn ghost block" style="margin-top:10px" onclick="go('home')">Done</button>
+    </div>
+
+    <div class="card">
+      <h2>Best places to sell</h2>
+      <p class="sub" style="font-size:12px;margin-top:4px">Top platforms for this item, ranked by fit.</p>
+      ${bestPlatformsHTML(it)}
+    </div>
+
+    <div class="card">
+      <h2>How we estimate</h2>
+      <p class="sub" style="font-size:12.5px">Profit = mid resale − fees − shipping − purchase price.</p>
+      <p class="sub" style="font-size:12.5px;margin-top:6px">${it.details}</p>
+      <div class="section-label" style="margin-top:14px">Price trend (est.)</div>
+      <canvas id="priceChart" style="width:100%;height:120px;margin-top:8px"></canvas>
+      <div class="row" style="justify-content:space-between;margin-top:4px"><span class="tiny">${it.trend==="up"?"Trending up":it.trend==="flat"?"Holding steady":"Softening"}</span><span class="tiny">est. time to sell: ${it.time} · ${it.difficulty}</span></div>
+    </div>`;
+  if(!state.pro){body.insertAdjacentHTML("afterbegin",`<div class="pro-banner" style="cursor:pointer" onclick="go('upgrade')"><h2>Unlock full analysis</h2><p style="font-size:13px;opacity:.95;margin-top:4px">Detailed price history, exact fee breakdowns & time-to-sell are Pro features.</p><button class="btn block" style="margin-top:12px;background:#fff;color:var(--primary)">Go Pro · $7.99/mo</button></div>`);}
+  drawPriceChart(it);
+}
+function drawPriceChart(it){
+  const cv=document.getElementById("priceChart");if(!cv)return;
+  const dpr=window.devicePixelRatio||1;const w=cv.clientWidth||300,h=120;
+  cv.width=w*dpr;cv.height=h*dpr;const ctx=cv.getContext("2d");ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);
+  const lo=it.resale[0],hi=it.resale[1],mid=(lo+hi)/2;
+  const trend=it.trend==="up"?[0.7,0.75,0.8,0.78,0.9,0.95,1.0]:it.trend==="flat"?[0.85,0.88,0.9,0.87,0.89,0.92,0.95]:[0.95,0.9,0.82,0.78,0.72,0.68,0.65];
+  const pts=trend.map(t=>mid*t);
+  const pad=10;const min=Math.min(...pts,lo)*0.9,max=Math.max(...pts,hi)*1.05;
+  const X=i=>pad+i*(w-2*pad)/(pts.length-1);
+  const Y=v=>h-pad-((v-min)/(max-min))*(h-2*pad);
+  ctx.strokeStyle="var(--primary)";ctx.lineWidth=2;ctx.lineJoin="round";
+  ctx.beginPath();pts.forEach((v,i)=>i===0?ctx.moveTo(X(i),Y(v)):ctx.lineTo(X(i),Y(v)));ctx.stroke();
+  ctx.fillStyle="var(--primary)";pts.forEach((v,i)=>{ctx.beginPath();ctx.arc(X(i),Y(v),3,0,7);ctx.fill();});
+  ctx.fillStyle="var(--muted)";ctx.font="10px sans-serif";ctx.textAlign="center";
+  ctx.fillText("3 mo ago",pad-2,h-2);ctx.fillText("now",w-pad,h-2);
+}
+
+function bestPlatformsHTML(it){
+  const recs=CATEGORY_PLATFORMS[it.cat]||CATEGORY_PLATFORMS.default;
+  const rank=recs.map(r=>({p:r[0],why:r[1],score:r[2]})).sort((a,b)=>b.score-a.score);
+  const best=rank[0];
+  return `<div class="chip badge-info" style="margin-top:8px;padding:7px 12px;font-size:13px"><b>Recommended: </b>${PLATFORM_NAME[best.p]}</div>
+    ${rank.map((r,i)=>`
+    <div class="platform-row" style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)">
+      <div class="platform-rank" style="width:28px;height:28px;border-radius:8px;background:${i===0?"var(--accent)":"var(--surface2)"};color:${i===0?"#fff":"var(--muted)"};display:grid;place-items:center;font-weight:700;font-size:13px">${i+1}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:14px"><span style="color:${PLATFORM_BRAND[r.p][1]};font-weight:800">${PLATFORM_BRAND[r.p][0]}</span> ${PLATFORM_NAME[r.p]}</div>
+        <div class="tiny" style="margin-top:2px">${r.why}</div>
+      </div>
+      <div class="tiny" style="font-weight:700;color:var(--primary)">${r.score}/100</div>
+    </div>`).join("")}
+    <div class="tiny" style="margin-top:10px;color:var(--muted)">Based on buyer demand, fees, and typical resale speed for this category.</div>`;
+}
+function reasonText(it,profit,rec){
+  if(rec==="buy")return `Strong demand (${it.demand}%) and ${toCurrency(Math.max(profit,0))} estimated profit after fees & shipping. Easy to sell in ${it.time}.`;
+  if(rec==="maybe")return `Moderate profit (${toCurrency(Math.max(profit,0))}). Worth buying only at or below the current price — negotiate down or look for similar demand.`;
+  return `Profit is thin or negative (${toCurrency(profit)}), demand is weak (${it.demand}%), or it may take a long time to sell. Pass unless you can buy it much cheaper.`;
+}
+function demandLabel(d){return d>=80?"Very high":d>=65?"High":d>=45?"Moderate":"Low";}
+function initial(name){const m=name.trim().match(/[A-Za-z0-9]/);return m?m[0].toUpperCase():"?";}
+
+/* ============ SAVE / HISTORY / SALES ============ */
+function saveItem(){const it=state.current;if(!it)return;state.saved.push({...it,date:Date.now()});toast("Saved to your list");save();go('saved');}
+function watchItem(){
+  const it=state.current;if(!it)return;
+  if(state.watchlist.some(w=>w.name===it.name)){toast("Already watching this item");return;}
+  state.watchlist.push({...it,date:Date.now(),alertOn:true});
+  if(!state.saved.some(w=>w.name===it.name))state.saved.push({...it,date:Date.now()});
+  save();toast("Added to watchlist 👁");go('saved');
+}
+function toggleAlert(name){const it=state.watchlist.find(w=>w.name===name);if(it){it.alertOn=!it.alertOn;save();renderSaved();toast(it.alertOn?"Price alerts on":"Price alerts off");}}
+function unwatch(name){state.watchlist=state.watchlist.filter(w=>w.name!==name);save();renderSaved();toast("Removed from watchlist");}
+function deleteScan(i){state.history.splice(i,1);renderHistory();save();}
+function renderHistory(){const q=(document.getElementById("histSearch")?.value||"").toLowerCase();
+  const list=state.history.filter(h=>h.name.toLowerCase().includes(q));
+  document.getElementById("historyList").innerHTML=list.length?list.map((h,i)=>`
+    <div class="list-item" onclick="state.current=h;go('result')">
+      <div class="thumb" style="font-weight:700;color:var(--primary)">${initial(h.name)}</div>
+      <div class="li-body">
+        <div class="li-title">${h.name}</div>
+        <div class="li-sub">${new Date(h.date).toLocaleDateString()} · ${h.cat} · ${h.cond}</div>
+        <div class="li-pro">${toCurrency(h.resale[0])}–${toCurrency(h.resale[1])}</div>
+      </div>
+      <button class="iconbtn" onclick="event.stopPropagation();deleteScan(${i})">×</button>
+    </div>`).join(""):`<div class="empty">No scans yet.<br>Try scanning your first item!</div>`;
+}
+function renderSaved(){
+  document.getElementById("watchList").innerHTML=state.watchlist.length?state.watchlist.map((it,i)=>`
+    <div class="list-item" onclick="state.current=it;go('result')">
+      <div class="thumb" style="font-weight:700;color:var(--primary)">${initial(it.name)}</div>
+      <div class="li-body">
+        <div class="li-title">${it.name}</div>
+        <div class="li-sub">${toCurrency(it.resale[0])}–${toCurrency(it.resale[1])}</div>
+      </div>
+      <button class="smallbtn" style="font-size:11px;padding:6px 9px" onclick="event.stopPropagation();toggleAlert(it.name)">${it.alertOn?'🔔 On':'🔕 Off'}</button>
+      <button class="iconbtn" onclick="event.stopPropagation();unwatch(it.name)">×</button>
+    </div>`).join(""):`<div class="empty">Nothing watched yet.<br>Tap Watch on a scan to track it.</div>`;
+  document.getElementById("savedList").innerHTML=state.saved.length?state.saved.map((it,i)=>`
+    <div class="list-item" onclick="state.current=it;go('result')">
+      <div class="thumb" style="font-weight:700;color:var(--primary)">${initial(it.name)}</div>
+    <div class="li-body">
+      <div class="li-title">${it.name}</div>
+      <div class="li-sub">Saved ${new Date(it.date).toLocaleDateString()}</div>
+    </div>
+    <button class="iconbtn" onclick="event.stopPropagation();state.saved.splice(i,1);renderSaved();save();toast('Removed')">×</button>
+  </div>`).join(""):`<div class="empty">Nothing saved yet.<br>Tap Save on a scan to keep it.</div>`;
+}
+function addSale(){const n=prompt("Item name:");if(!n)return;state.sales.push({name:n,buy:0,sell:0,fees:0,ship:0,date:Date.now()});renderSales();save();}
+function drawProfitChart(){
+  const cv=document.getElementById("profitChart");if(!cv)return;
+  const dpr=window.devicePixelRatio||1;
+  const w=cv.clientWidth||300, h=140;
+  cv.width=w*dpr; cv.height=h*dpr; const ctx=cv.getContext("2d"); ctx.scale(dpr,dpr);
+  const pts=state.sales.map(s=>(s.sell-s.buy-s.fees-s.ship)).slice(-12);
+  const max=Math.max(1,...pts.map(Math.abs));
+  const bw=w/Math.max(pts.length,1);
+  ctx.clearRect(0,0,w,h);
+  const mid=h/2;
+  ctx.strokeStyle="var(--border)";ctx.setLineDash([3,3]);ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(0,mid);ctx.lineTo(w,mid);ctx.stroke();ctx.setLineDash([]);
+  pts.forEach((v,i)=>{const bh=Math.abs(v)/max*(mid-8);const y=v>=0?mid-bh:mid;
+    ctx.fillStyle=v>=0?"var(--buy)":"var(--skip)";
+    ctx.fillRect(i*bw+3,y,bw-6,bh);});
+}
+function renderSales(){const list=document.getElementById("salesList");
+  const total=state.sales.reduce((a,s)=>a+(s.sell-s.buy-s.fees-s.ship),0);
+  // stats dashboard
+  const statsCard=document.getElementById("salesStatsCard");
+  const sCount=state.sales.length;
+  if(sCount){statsCard.style.display="block";
+    document.getElementById("saleCount").textContent=sCount;
+    document.getElementById("avgProfit").textContent=toCurrency(total/sCount);
+    document.getElementById("avgMargin").textContent=Math.round(state.sales.reduce((a,s)=>a+(s.sell?((s.sell-s.buy-s.fees-s.ship)/s.sell)*100:0),0)/sCount)+"%";
+    drawProfitChart();
+  } else {statsCard.style.display="none";}
+  list.innerHTML=`<div class="metrics" style="grid-template-columns:1fr 1fr"><div class="metric"><div class="lab">Total sales</div><div class="val">${state.sales.length}</div></div><div class="metric"><div class="lab">Net profit</div><div class="val ${total>=0?'green':'red'}">${toCurrency(total)}</div></div></div>`
+  + (state.sales.length?state.sales.map((s,i)=>`
+    <div class="card" style="margin-top:12px">
+      <div class="row"><div class="li-body"><div class="li-title">${s.name}</div><div class="li-sub">${new Date(s.date).toLocaleDateString()}</div></div><button class="iconbtn" onclick="state.sales.splice(${i},1);renderSales();save()">×</button></div>
+      <div class="grid g2" style="margin-top:10px">
+        <div class="inputgroup"><label>Buy</label><div class="currency"><span class="cur">${CURR[state.cur][0]}</span><input type="number" value="${s.buy}" oninput="s.buy=+this.value;renderSales();save()"></div></div>
+        <div class="inputgroup"><label>Sell</label><div class="currency"><span class="cur">${CURR[state.cur][0]}</span><input type="number" value="${s.sell}" oninput="s.sell=+this.value;renderSales();save()"></div></div>
+        <div class="inputgroup"><label>Fees</label><div class="currency"><span class="cur">${CURR[state.cur][0]}</span><input type="number" value="${s.fees}" oninput="s.fees=+this.value;renderSales();save()"></div></div>
+        <div class="inputgroup"><label>Shipping</label><div class="currency"><span class="cur">${CURR[state.cur][0]}</span><input type="number" value="${s.ship}" oninput="s.ship=+this.value;renderSales();save()"></div></div>
+      </div>
+      <div class="metric" style="margin-top:12px;background:var(--surface2)"><div class="lab">Actual profit</div><div class="val ${(s.sell-s.buy-s.fees-s.ship)>=0?'green':'red'}">${toCurrency(s.sell-s.buy-s.fees-s.ship)}</div></div>
+    </div>`).join(""):`<div class="empty">Track your real sales here to refine your strategy.</div>`);
+}
+function renderHome(){
+  const h=new Date().getHours();const g=h<12?"Good morning":h<18?"Good afternoon":"Good evening";
+  document.getElementById("greet").textContent=g;
+  const list=document.getElementById("homeRecent");
+  list.innerHTML=state.history.length?state.history.slice(0,4).map(h=>
+    `<div class="list-item" onclick="state.current=h;go('result')"><div class="thumb" style="font-weight:700;color:var(--primary)">${initial(h.name)}</div><div class="li-body"><div class="li-title">${h.name}</div><div class="li-sub">${new Date(h.date).toLocaleDateString()}</div><div class="li-pro">${toCurrency(h.resale[0])}–${toCurrency(h.resale[1])}</div></div></div>`).join(""):"";
+  document.getElementById("homeScans").textContent=state.history.length;
+  document.getElementById("homeSavedC").textContent=state.saved.length;
+  document.getElementById("homeProfit").textContent=toCurrency(state.sales.reduce((a,s)=>a+(s.sell-s.buy-s.fees-s.ship),0));
+  // email box state
+  const eb=document.getElementById("emailBox");
+  if(state.email&&eb){eb.innerHTML=`<div style="display:flex;align-items:center;gap:10px;color:var(--buy)"><b style="font-size:14px">✓</b><span style="font-size:13px;font-weight:600">You're on the list — resale tips coming your way.</span></div>`;}
+}
+function renderSettings(){
+  document.getElementById("subCard").innerHTML=state.pro
+  ?`<div class="setting"><div><div class="st-l">Pro plan</div><div class="st-s">Unlimited scans · $7.99/mo</div></div><button class="smallbtn" onclick="toast('Subscription active')">Active</button></div>`
+  :`<div class="setting"><div><div class="st-l">Free plan</div><div class="st-s">10 scans per day</div></div><button class="smallbtn" onclick="go('upgrade')">Upgrade</button></div>`;
+  const acc=document.getElementById("acctState");
+  if(!acc)return;
+  if(state.session){
+    document.getElementById("acctForm").classList.add("hidden");
+    acc.innerHTML=`<div class="setting"><div><div style="font-weight:700">Signed in</div><div class="st-s">${state.session.email}</div><div class="st-s" style="font-size:11px;color:var(--buy)">Syncing across devices ✓</div></div>
+    <div style="display:flex;gap:8px"><button class="smallbtn" onclick="syncPull()">Sync now</button><button class="smallbtn" style="color:var(--skip);border-color:var(--skip)" onclick="logoutUser()">Sign out</button></div></div>`;
+  } else {
+    acc.innerHTML=`<div class="setting"><div><div class="st-l">Cloud sync</div><div class="st-s">Free · Back up & sync your data</div></div><button class="smallbtn" onclick="document.getElementById('acctForm').classList.toggle('hidden')">${document.getElementById("acctForm").classList.contains("hidden")?"Set up":"Hide"}</button></div>`;
+  }
+  document.getElementById("acctPlan").textContent=state.pro?"Pro · $7.99/mo":"Free plan";
+}
+function updateCalc(){}
+function setCurrency(){state.cur=document.getElementById("currency").value;if(state.current)renderResult();renderHome();save();}
+function toggleDark(){document.documentElement.setAttribute("data-theme",document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark");
+  document.getElementById("darkSwitch").classList.toggle("on");}
+/* ============ CHECKOUT / PAYMENT ============ */
+function renderCheckout(){
+  if(state.pro){toast("You're already on Pro");go('settings');return;}
+  const cur=CURR[state.cur][0];
+  document.getElementById("checkoutSummary").innerHTML=`
+    <div class="row" style="justify-content:space-between">
+      <div><div style="font-weight:700;font-size:15px">Picflip Pro</div><div class="tiny">Monthly subscription</div></div>
+      <div style="text-align:right"><div style="font-weight:900;font-size:20px">${cur}7.99</div><div class="tiny">/ month</div></div>
+    </div>
+    <div style="height:1px;background:var(--border);margin:12px 0"></div>
+    <div class="row" style="justify-content:space-between"><span style="font-size:13px">Unlimited scans + full analysis</span><b>${cur}7.99</b></div>
+    <div class="row" style="justify-content:space-between;margin-top:6px"><span class="tiny">Tax</span><span class="tiny">Included</span></div>
+    <div style="height:1px;background:var(--border);margin:12px 0"></div>
+    <div class="row" style="justify-content:space-between"><b>Total due today</b><b style="font-size:17px">${cur}7.99</b></div>`;
+}
+function fmtCard(el){el.value=el.value.replace(/\D/g,"").slice(0,16).replace(/(.{4})/g,"$1 ").trim();}
+function fmtExp(el){el.value=el.value.replace(/\D/g,"").slice(0,4);if(el.value.length>2)el.value=el.value.slice(0,2)+"/"+el.value.slice(2);}
+function processPayment(){
+  const num=document.getElementById("cardNum").value.replace(/\s/g,"");
+  const exp=document.getElementById("cardExp").value;
+  const cvc=document.getElementById("cardCvc").value;
+  const name=document.getElementById("cardName").value.trim();
+  if(num.length<16){toast("Enter a valid 16-digit card number");return;}
+  if(!/^\d{2}\/\d{2}$/.test(exp)){toast("Enter a valid expiry (MM/YY)");return;}
+  if(cvc.length<3){toast("Enter a valid CVC");return;}
+  if(!name){toast("Enter the name on the card");return;}
+  const btn=document.querySelector("#page-checkout .btn.block");
+  btn.textContent="Processing payment…";btn.disabled=true;
+  setTimeout(()=>{
+    upgrade();
+    toast("Payment successful — Pro activated");
+    btn.disabled=false;btn.textContent="Pay $7.99 & Activate Pro";
+  },1400);
+}
+function upgrade(){state.pro=true;state.scans=999;renderPill();renderSettings();save();toast("Welcome to Pro — unlimited scans unlocked");go('settings');}
+function clearAllData(){
+  if(!confirm("Clear all your data? This permanently deletes scans, saved items, sales, and resets your plan."))return;
+  state={pro:false, scans:10, cur:state.cur, history:[], saved:[], sales:[], current:null, platform:state.platform, ship:state.ship};
+  save(); renderPill(); renderSettings(); renderHome(); go('home');
+  toast("All data cleared");
+}
+
+/* ============ ONBOARDING & EMAIL ============ */
+function openOnboard(){document.getElementById("onboard").style.display="flex";}
+function closeOnboard(){document.getElementById("onboard").style.display="none";state.onboarded=true;save();}
+function saveEmail(){
+  const v=document.getElementById("emailInput").value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){toast("Please enter a valid email");return;}
+  state.email=v; save(); toast("Email saved ✓");
+  document.getElementById("emailBox").innerHTML=`<div style="display:flex;align-items:center;gap:10px;color:var(--buy)"><b style="font-size:14px">✓</b><span style="font-size:13px;font-weight:600">You're on the list — resale tips coming your way.</span></div>`;
+}
+
+/* ============ SPLASH / LOADING ============ */
+function runSplash(){
+  const fill=document.getElementById("splashFill");
+  const prog=document.getElementById("splashProg");
+  let p=0;
+  const iv=setInterval(()=>{
+    p=Math.min(p+Math.floor(Math.random()*18)+6,100);
+    fill.style.width=p+"%"; prog.textContent=p+"%";
+    if(p>=100){
+      clearInterval(iv);
+      setTimeout(()=>{
+        document.getElementById("splash").classList.add("hide");
+        setTimeout(()=>document.getElementById("splash").style.display="none",450);
+      },200);
+    }
+  },90);
+}
+
+/* init */
+load();
+renderSamples();renderPill();renderHome();
+runSplash();
+setTimeout(()=>{if(!state.onboarded)openOnboard();},3200);
+</script>
+</body>
+</html>
